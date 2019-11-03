@@ -5,7 +5,10 @@ import matplotlib.pyplot as plt
 # Model is the current version of the model {'W1':W1, 'b1’:b1, 'W2':W2, 'b2',b2}. It's a dictionary
 # x is one sample (without the label)
 def predict(model, x):
-	pass
+	a = np.add(np.matmul(x,model["W1"]), model["b1"])
+	h = np.tanh(a)
+	z = np.add(np.matmul(h,model["W2"]), model["b2"])
+	
 
 # Helper function to evaluate the total loss on the dataset
 # model is the current version of the model {'W1':W1, 'b1’:b1, 'W2':W2, 'b2',b2}. It's a dictionary
