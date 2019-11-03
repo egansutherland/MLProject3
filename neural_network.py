@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import math
+learning_rate = 0.01
 
 # Helper function to predict an output (0 or 1)
 # Model is the current version of the model {'W1':W1, 'b1’:b1, 'W2':W2, 'b2',b2}. It's a dictionary
@@ -17,7 +19,15 @@ def predict(model, x):
 # X is all the training data
 # y is the training labels
 def calculate_loss(model, X, y):
-	pass
+	n = len(X[0])
+	y_hat = np.array()
+	for sample in X:
+		y_hat.append(predict(model, sample))
+	y_hat = np.log(y_hat)
+	intermediate = np.matmul(y,y_hat)
+	return_value = np.sum(intermediate)*(-1/n)
+	return return_value
+
 
 # This function learns parameters for the neural network and returns the model.
 # - X is the training data
