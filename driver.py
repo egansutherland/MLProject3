@@ -2,7 +2,7 @@
 # @Author: Chris Peterson
 # @Date:   2019-11-03 18:39:25
 # @Last Modified by:   Chris Peterson
-# @Last Modified time: 2019-11-04 22:50:13
+# @Last Modified time: 2019-11-05 12:09:54
 import neural_network as nnet
 import numpy as np
 from sklearn.datasets import make_moons
@@ -36,6 +36,6 @@ for i, nn_hdim in enumerate(hidden_layer_dimensions):
 	# print(y)
 	
 	model = nnet.build_model(X, y, nn_hdim)
-	plot_decision_boudary(lambda x: predict(model,x),X,y)
+	plot_decision_boundary(lambda x: predict(model,x),X,y)
 plt.show()
 
