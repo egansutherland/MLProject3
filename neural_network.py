@@ -40,13 +40,13 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 	# Initialize weights randomly
 	W1 = np.random.rand(len(X[0]), nn_hdim)
 	W2 = np.random.rand(nn_hdim, 2)
-	b1 = np.random.rand((1,nn_hdim))
-	b2 = np.random.rand((1,len(X[0])))
+	b1 = np.random.rand(nn_hdim)
+	b2 = np.random.rand(len(X[0]))
 	# Gradient variables for back-prop
 	grad_W1 = np.zeros((2,nn_hdim))
 	grad_W2 = np.zeros((nn_hdim, 2))
-	grad_b1 = np.zeros((1,nn_hdim))
-	grad_b2 = np.zeros((1,len(X[0])))
+	grad_b1 = np.zeros(nn_hdim)
+	grad_b2 = np.zeros(len(X[0]))
 
 	model = {"W1": W1, "W2": W2, "b1": b1, "b2": b2}
 
@@ -58,11 +58,11 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 				loss = calculate_loss(model, X, y)
 				print(loss)
 			dl_dy = y_hat - y[j]
-			a = np.add(np.matmul(X[j],W1), b1)
-			dl_da = np.matmul(np.matmul((1 - (math.pow(np.tanh(a,2)))),dl_dy), np.transpose(W2))
-			h = np.tanh(a)
+			a = np.matmul(X,W1) + b1
+			dl_da = np.multiply((1 - (np.square(np.tanh(a)))),np.matmul(dl_dy, np.transpose(W2)))
+			h = np.tanh(np.add(np.matmul(X,W1),b1))
 			dl_w2 = np.matmul(np.transpose(h),dl_dy)
-			dl_w1 = np.matmul(np.transepose(X[j]), dl_da) 
+			dl_w1 = np.matmul(np.transepose(X), dl_da) 
 			dl_b1 = copy.deepcopy(dl_da)
 			dl_b2 = copy.deepcopy(dl_dy)
 
@@ -88,13 +88,3 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 
 	
 
-def plot_decision_boundary(pred_func, X, y):
-	# Set min and max values and give it some padding
-	x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
-	y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
-	h = 0.01
-	# Generate a gride of points with distance h between them
-	xx, yy = np.meshgrid(np.arrange(x_min, x_max, h), np.arrange(y_min, y_max, h))
-	# Predict the function value for the whole grid
-	Z = pred_func(np.c_[xx.ravel(), yy.ravel()])
-	Z = Z.reshape(xx.shape)
