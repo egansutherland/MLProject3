@@ -24,15 +24,15 @@ def predict(model, x):
 def calculate_loss(model, X, y):
 	n = len(X[0])
 	loss = 0
-	for sample, label in X, y:
+	for i in range(0, len(X)):
 		# Forward propagation. Same as predict, but keeps y_hat as a 2d array
-		a = np.add(np.matmul(sample, model['W1']), model['b1'])
+		a = np.add(np.matmul(X[i], model['W1']), model['b1'])
 		h = np.tanh(a)
 		z = np.add(np.matmul(h, model['W2']), model['b2'])
 		z = np.exp(z)
-		y_hat = np.true_divide(z, np.sum(z))
+		y_hat = np.true_divide(z[0], np.sum(z[0]))
 		y_label =[]
-		if label == 0:
+		if y[i] == 0:
 			y_label = np.array([1, 0])
 		else:
 			y_label = np.array([0, 1])
@@ -50,19 +50,15 @@ def calculate_loss(model, X, y):
 def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 	global learning_rate
 	# Initialize weights randomly
-	W1 = np.random.rand(len(X[0]), nn_hdim)
-	W2 = np.random.rand(nn_hdim, 2)
-	b1 = np.random.rand(nn_hdim)
-	b2 = np.random.rand(2)
-	print('w1', W1)
-	print('w1 shape', W1.shape)
-	print('w2', W2)
-	print('w2 shape', W2.shape)
+	W1 = np.random.random_sample((len(X[0]), nn_hdim)) * 2 - 1
+	W2 = np.random.random_sample((nn_hdim, 2)) * 2 - 1
+	b1 = np.random.random_sample((1, nn_hdim)) * 2 - 1
+	b2 = np.random.random_sample((1, 2)) * 2 - 1
 	# Gradient variables for back-prop
 	grad_W1 = np.zeros((len(X[0]), nn_hdim))
 	grad_W2 = np.zeros((nn_hdim, 2))
-	grad_b1 = np.zeros(nn_hdim)
-	grad_b2 = np.zeros(2)
+	grad_b1 = np.zeros((1, nn_hdim))
+	grad_b2 = np.zeros((1, 2))
 	# Setup model variable
 	model = {"W1": W1, "W2": W2, "b1": b1, "b2": b2}
 
@@ -75,12 +71,12 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 			h = np.tanh(a)
 			z = np.add(np.matmul(h, W2), b2)
 			z = np.exp(z)
-			y_hat = np.true_divide(z, np.sum(z))
+			y_hat = np.true_divide(z[0], np.sum(z[0]))
 
 			# print the loss every 1000 epochs
-			if print_loss and i == 1000:
+			if print_loss and i % 1000 == 0 and j ==0:
 				loss = calculate_loss(model, X, y)
-				print(loss)
+				print('iteration:', i, 'loss:', loss)
 
 			# Some set up for the back propagation
 			
@@ -94,8 +90,8 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 			# distinction. It just returns an iterator. To fix this, you have
 			# to force it into a 2D array simply by enclosing the single array
 			# into another array. Like so: [ [b1, b2] ]
-			h = np.array([h])
-			y_hat = np.array([y_hat])
+			# h = np.array([h])
+			# y_hat = np.array([y_hat])
 
 			sample = np.array([X[j]])
 
@@ -108,13 +104,14 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 				yj = np.array([0,1])
 
 			#Back propagation	
-			dl_dy = np.subtract(y_hat, yj)
+			dl_dy = np.array([np.subtract(y_hat, yj)])
 			dl_da = np.multiply(1 - np.square(h), np.matmul(dl_dy, np.transpose(W2)))
 			dl_da.reshape((1, nn_hdim))
 			dl_w2 = np.matmul(np.transpose(h), dl_dy)
-			dl_w1 = np.matmul(np.transpose(sample), dl_da) 
-			dl_b1 = copy.deepcopy(dl_da)
-			dl_b2 = copy.deepcopy(dl_dy)
+			dl_w1 = np.matmul(np.transpose(sample), dl_da)
+			# Purposeful aliasing for readability
+			dl_b1 = dl_da
+			dl_b2 = dl_dy
 
 			grad_W1 = grad_W1 + dl_w1
 			grad_W2 = grad_W2 + dl_w2
@@ -124,8 +121,8 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 		## finished one epoch
 
 		# Fix shape change
-		grad_b1 = np.reshape(grad_b1, b1.shape)
-		grad_b2 = np.reshape(grad_b2, b2.shape)
+		# grad_b1 = np.reshape(grad_b1, b1.shape)
+		# grad_b2 = np.reshape(grad_b2, b2.shape)
 
 		# Get average gradients
 		grad_W1 = grad_W1/len(X)
@@ -144,7 +141,7 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 		model["b2"] = b2
 
 		# Clear average gradient counters and keep going
-		grad_W1 = np.zeros((len(X[0]),nn_hdim))
+		grad_W1 = np.zeros((len(X[0]), nn_hdim))
 		grad_W2 = np.zeros((nn_hdim, 2))
 		grad_b1 = np.zeros(nn_hdim)
 		grad_b2 = np.zeros(2)
