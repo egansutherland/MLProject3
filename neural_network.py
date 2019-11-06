@@ -25,8 +25,12 @@ def calculate_loss(model, X, y):
 	n = len(X[0])
 	loss = 0
 	for sample, label in X, y:
-		y_hat = predict(model, sample)
-		y_hat = np.log(y_hat)
+		# Forward propagation. Same as predict, but keeps y_hat as a 2d array
+		a = np.add(np.matmul(sample, model['W1']), model['b1'])
+		h = np.tanh(a)
+		z = np.add(np.matmul(h, model['W2']), model['b2'])
+		z = np.exp(z)
+		y_hat = np.true_divide(z, np.sum(z))
 		y_label =[]
 		if label == 0:
 			y_label = np.array([1, 0])
@@ -86,7 +90,7 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 			#                            b2 ]
 			# Where the original is a row vector and the other is a column vector
 			# This distinction in shape is important for matrix multiplication
-			# but since it's one dimensional the numpy view seeminlgy makes no
+			# but since it's one dimensional the numpy view seemingly makes no
 			# distinction. It just returns an iterator. To fix this, you have
 			# to force it into a 2D array simply by enclosing the single array
 			# into another array. Like so: [ [b1, b2] ]
@@ -112,19 +116,6 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 			dl_b1 = copy.deepcopy(dl_da)
 			dl_b2 = copy.deepcopy(dl_dy)
 
-			# print('--------------------------')
-			# print('dl_dy shape', dl_dy.shape)
-			# print('dl_da shape', dl_da.shape)
-			# print('dl_w2 shape', dl_w2.shape)
-			# print('grad_W2 shape', grad_W2.shape)
-			# print('dl_w1 shape', dl_w1.shape)
-			# print('grad_W1 shape', grad_W1.shape)
-			# print('dl_b1 shape', dl_b1.shape)
-			# print('grad_b1 shape', grad_b1.shape)
-			# print('dl_b2.shape', dl_b2.shape)
-			# print('grad_b2 shape', grad_b2.shape)
-			# print('--------------------------')
-
 			grad_W1 = grad_W1 + dl_w1
 			grad_W2 = grad_W2 + dl_w2
 			grad_b1 = grad_b1 + dl_b1
@@ -135,18 +126,6 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 		# Fix shape change
 		grad_b1 = np.reshape(grad_b1, b1.shape)
 		grad_b2 = np.reshape(grad_b2, b2.shape)
-		# print('grad_W1', grad_W1)
-		# print('shape grad_W1', grad_W1.shape)
-		# print('shape W1', W1.shape)
-		# print('grad_W2', grad_W2)
-		# print('shape grad_W2', grad_W2.shape)
-		# print('shape W2', W2.shape)
-		# print('grad_b1', grad_b1)
-		# print('shape grad_b1', grad_b1.shape)
-		# print('shape b1', b1.shape)
-		# print('grad_b2', grad_b2)
-		# print('shape grad_b2', grad_b2.shape)
-		# print('shape b2', b2.shape)
 
 		# Get average gradients
 		grad_W1 = grad_W1/len(X)
