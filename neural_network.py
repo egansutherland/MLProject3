@@ -13,7 +13,7 @@ def predict(model, x):
 	z = np.add(np.matmul(h,model["W2"]), model["b2"])
 	z = np.exp(z)
 	z = np.true_divide(z,np.sum(z))
-	return np.argmax(z)	
+	return z
 
 # Helper function to evaluate the total loss on the dataset
 # model is the current version of the model {'W1':W1, 'b1’:b1, 'W2':W2, 'b2',b2}. It's a dictionary
@@ -21,11 +21,17 @@ def predict(model, x):
 # y is the training labels
 def calculate_loss(model, X, y):
 	n = len(X[0])
-	y_hat = np.array()
-	for sample in X:
-		y_hat.append(predict(model, sample))
-	y_hat = np.log(y_hat)
-	return_value = np.dot(y,y_hat)*(-1)*math.pow(n,-1)
+	loss = 0
+	for sample,label in X,y:
+		y_hat = predict(model, sample)
+		y_hat = np.log(y_hat)
+		y_label =[]
+		if label == 0:
+			y_label = np.array([1,0])
+		else:
+			y_label = np.array([0,1])
+		loss = loss + (y_label[0]*np.log(y_hat[0])) + (y_label[1]*np.log(y_hat[1]))
+	return_value = loss*(-1)/n
 	return return_value
 
 
@@ -89,8 +95,15 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 			# is always necessary
 			sample = np.array([X[j]])
 
+			# Since labels is a list of classes (0 or 1), have to convert to a probability distribution
+			yj = []
+			if y[j] == 0:
+				yj = np.array([1,0])
+			else:
+				yj = np.array([0,1])
+
 			#Back propagation	
-			dl_dy = y_hat - y[j]
+			dl_dy = y_hat - yj
 			dl_da = np.multiply(1 - np.square(h), np.matmul(dl_dy, np.transpose(W2)))
 			# print('h shape', h.shape)
 			# print('h', h)
