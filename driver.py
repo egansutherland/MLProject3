@@ -2,7 +2,7 @@
 # @Author: Chris Peterson
 # @Date:   2019-11-03 18:39:25
 # @Last Modified by:   Chris Peterson
-# @Last Modified time: 2019-11-05 16:07:07
+# @Last Modified time: 2019-11-06 12:33:22
 import neural_network as nnet
 import numpy as np
 from sklearn.datasets import make_moons
@@ -21,7 +21,7 @@ def plot_decision_boundary(pred_func, X, y):
     # Predict the function value for the whole grid
     Z = pred_func(np.c_[xx.ravel(), yy.ravel()])
     Z = Z.reshape(xx.shape)
-    plt.contourf(xx, yy, Z, emap=plt.cm.Spectral)
+    plt.contourf(xx, yy, Z, cmap=plt.cm.Spectral)
     plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.Spectral)
 
 

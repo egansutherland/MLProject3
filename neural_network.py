@@ -62,6 +62,9 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 	# Setup model variable
 	model = {"W1": W1, "W2": W2, "b1": b1, "b2": b2}
 
+	# Total values in dataset
+	N = len(X)
+
 	for i in range(0,num_passes):
 		for j in range(0, len(X)):
 
@@ -125,16 +128,16 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 		# grad_b2 = np.reshape(grad_b2, b2.shape)
 
 		# Get average gradients
-		grad_W1 = grad_W1/len(X)
-		grad_W2 = grad_W2/len(X)
-		grad_b1 = grad_b1/len(X)
-		grad_b2 = grad_b2/len(X)
+		grad_W1 = grad_W1/N
+		grad_W2 = grad_W2/N
+		grad_b1 = grad_b1/N
+		grad_b2 = grad_b2/N
 
 		# update weights and biases
-		W1 = np.subtract(W1, grad_W1 * learning_rate)
-		W2 = np.subtract(W2, grad_W2 * learning_rate)
-		b1 = np.subtract(b1, grad_b1 * learning_rate)
-		b2 = np.subtract(b2, grad_b2 * learning_rate)
+		W1 = np.subtract(W1, grad_W1*learning_rate)
+		W2 = np.subtract(W2, grad_W2*learning_rate)
+		b1 = np.subtract(b1, grad_b1*learning_rate)
+		b2 = np.subtract(b2, grad_b2*learning_rate)
 		model["W1"] = W1
 		model["W2"] = W2
 		model["b1"] = b1
