@@ -14,37 +14,30 @@ def plot_decision_boundary(pred_func, X, y):
 	x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
 	y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
 	h = 0.01
-	# Generate a gride of points with distance h between them
+	# Generate a grid of points with distance h between them
 	xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
 	# Predict the function value for the whole grid
 	Z = pred_func(np.c_[xx.ravel(), yy.ravel()])
+	# print('Z', Z)
 	print('Z shape', Z.shape)
+	print('param shape', np.c_[xx.ravel(), yy.ravel()].shape )
 	print('xx shape', xx.shape)
 	Z = Z.reshape(xx.shape)
+	plt.contourf(xx, yy, Z, emap=plt.cm.Spectral)
+	plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.Spectral)
+
 
 np.random.seed(0)
-X, y = make_moons(200, noise = 0.20)
-plt.scatter(X[:,0], X[:,1], s=40, c=y, cmap=plt.cm.Spectral)
+X, y = make_moons(200, noise=0.20)
+plt.scatter(X[:, 0], X[:, 1], s=40, c=y, cmap=plt.cm.Spectral)
 
-plt.figure(figsize=(16,32))
-hidden_layer_dimensions = [1,2,3,4]
+plt.figure(figsize=(16, 32))
+hidden_layer_dimensions = [1]#, 2, 3, 4]
 for i, nn_hdim in enumerate(hidden_layer_dimensions):
-	plt.subplot(5,2,i+1)
+	plt.subplot(5, 2, i+1)
 	plt.title('HiddenLayerSize%d' % nn_hdim)
-	
-
-	x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
-	y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
-	h = 0.01
-	# Generate a gride of points with distance h between them
-	xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-	# Predict the function value for the whole grid
-
-	print('xx', xx)
-	print('yy', yy)
-	print('param',np.c_[xx.ravel(), yy.ravel()] )
-
-	model = nnet.build_model(X, y, nn_hdim)
-	plot_decision_boundary(lambda X: np.array([nnet.predict(model,x) for x in X]),X,y)
+	model = nnet.build_model(X, y, nn_hdim, num_passes=100)
+	print('model', model)
+	plot_decision_boundary(lambda X: np.array([nnet.predict(model, x) for x in X]), X, y)
 plt.show()
 

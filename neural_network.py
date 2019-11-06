@@ -4,16 +4,18 @@ import math
 import copy
 learning_rate = 0.01
 
+
 # Helper function to predict an output (0 or 1)
 # Model is the current version of the model {'W1':W1, 'b1’:b1, 'W2':W2, 'b2',b2}. It's a dictionary
 # x is one sample (without the label)
 def predict(model, x):
-	a = np.add(np.matmul(x,model["W1"]), model["b1"])
+	a = np.add(np.matmul(x, model["W1"]), model["b1"])
 	h = np.tanh(a)
-	z = np.add(np.matmul(h,model["W2"]), model["b2"])
+	z = np.add(np.matmul(h, model["W2"]), model["b2"])
 	z = np.exp(z)
-	z = np.true_divide(z,np.sum(z))
-	return z
+	z = np.true_divide(z, np.sum(z))
+	return np.argmax(z)
+
 
 # Helper function to evaluate the total loss on the dataset
 # model is the current version of the model {'W1':W1, 'b1’:b1, 'W2':W2, 'b2',b2}. It's a dictionary
@@ -22,14 +24,14 @@ def predict(model, x):
 def calculate_loss(model, X, y):
 	n = len(X[0])
 	loss = 0
-	for sample,label in X,y:
+	for sample, label in X, y:
 		y_hat = predict(model, sample)
 		y_hat = np.log(y_hat)
 		y_label =[]
 		if label == 0:
-			y_label = np.array([1,0])
+			y_label = np.array([1, 0])
 		else:
-			y_label = np.array([0,1])
+			y_label = np.array([0, 1])
 		loss = loss + (y_label[0]*np.log(y_hat[0])) + (y_label[1]*np.log(y_hat[1]))
 	return_value = loss*(-1)/n
 	return return_value
@@ -48,8 +50,12 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 	W2 = np.random.rand(nn_hdim, 2)
 	b1 = np.random.rand(nn_hdim)
 	b2 = np.random.rand(2)
+	print('w1', W1)
+	print('w1 shape', W1.shape)
+	print('w2', W2)
+	print('w2 shape', W2.shape)
 	# Gradient variables for back-prop
-	grad_W1 = np.zeros((len(X[0]),nn_hdim))
+	grad_W1 = np.zeros((len(X[0]), nn_hdim))
 	grad_W2 = np.zeros((nn_hdim, 2))
 	grad_b1 = np.zeros(nn_hdim)
 	grad_b2 = np.zeros(2)
@@ -63,9 +69,9 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 			# Forward propagation. Same as predict, but keeps y_hat as a 2d array
 			a = np.add(np.matmul(X[j],W1),b1)
 			h = np.tanh(a)
-			z = np.add(np.matmul(h,W2),b2)
+			z = np.add(np.matmul(h, W2), b2)
 			z = np.exp(z)
-			y_hat = np.true_divide(z,np.sum(z))
+			y_hat = np.true_divide(z, np.sum(z))
 
 			# print the loss every 1000 epochs
 			if print_loss and i == 1000:
@@ -105,13 +111,7 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 			#Back propagation	
 			dl_dy = y_hat - yj
 			dl_da = np.multiply(1 - np.square(h), np.matmul(dl_dy, np.transpose(W2)))
-			# print('h shape', h.shape)
-			# print('h', h)
-			# print('h transpose shape' ,np.transpose(h).shape)
-			# print(np.transpose(h))
-			# print('dl_dy shape', dl_dy.shape)
-			# print('dl_dy', dl_dy)
-			dl_w2 = np.matmul(np.transpose(h),dl_dy)
+			dl_w2 = np.matmul(np.transpose(h), dl_dy)
 			dl_w1 = np.matmul(np.transpose(sample), dl_da) 
 			dl_b1 = copy.deepcopy(dl_da)
 			dl_b2 = copy.deepcopy(dl_dy)
