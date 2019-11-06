@@ -67,7 +67,7 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 
 
 			# Forward propagation. Same as predict, but keeps y_hat as a 2d array
-			a = np.add(np.matmul(X[j],W1),b1)
+			a = np.add(np.matmul(X[j], W1), b1)
 			h = np.tanh(a)
 			z = np.add(np.matmul(h, W2), b2)
 			z = np.exp(z)
@@ -89,17 +89,12 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 			# but since it's one dimensional the numpy view seeminlgy makes no
 			# distinction. It just returns an iterator. To fix this, you have
 			# to force it into a 2D array simply by enclosing the single array
-			# into another array. Like so: [ [b1, b2] ] 
-			# 
-			# Note this is an issue only when nn_hdim is 1
-			# so below is a check for that condition and applies needed fixes
-			if nn_hdim == 1:
-				h = np.array([h])
-				y_hat = np.array([y_hat])
+			# into another array. Like so: [ [b1, b2] ]
+			h = np.array([h])
+			y_hat = np.array([y_hat])
 
-			# Since X is an array 1D feature vectors, the following conversion
-			# is always necessary
 			sample = np.array([X[j]])
+
 
 			# Since labels is a list of classes (0 or 1), have to convert to a probability distribution
 			yj = []
@@ -109,8 +104,9 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 				yj = np.array([0,1])
 
 			#Back propagation	
-			dl_dy = y_hat - yj
+			dl_dy = np.subtract(y_hat, yj)
 			dl_da = np.multiply(1 - np.square(h), np.matmul(dl_dy, np.transpose(W2)))
+			dl_da.reshape((1, nn_hdim))
 			dl_w2 = np.matmul(np.transpose(h), dl_dy)
 			dl_w1 = np.matmul(np.transpose(sample), dl_da) 
 			dl_b1 = copy.deepcopy(dl_da)
