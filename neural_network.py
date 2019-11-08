@@ -22,7 +22,7 @@ def predict(model, x):
 # X is all the training data
 # y is the training labels
 def calculate_loss(model, X, y):
-	n = len(X[0])
+	n = len(X)
 	loss = 0
 	for i in range(0, len(X)):
 		# Forward propagation. Same as predict, but keeps y_hat as a 2d array
@@ -64,8 +64,9 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 
 	# Total values in dataset
 	N = len(X)
+	iteration = 0
 
-	for i in range(0,num_passes):
+	while iteration < num_passes:
 		for j in range(0, len(X)):
 
 
@@ -77,27 +78,12 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 			y_hat = np.true_divide(z[0], np.sum(z[0]))
 
 			# print the loss every 1000 epochs
-			if print_loss and i % 1000 == 0 and j ==0:
+			if print_loss and iteration % 1000 == 0:
 				loss = calculate_loss(model, X, y)
-				print('iteration:', i, 'loss:', loss)
+				print('iteration:', iteration, 'loss:', loss)
 
 			# Some set up for the back propagation
-			
-			# Numpy representation vectors is troublesome for multiplication:
-			# We know:    b2 = [ b1 b2]
-			# and the transpose is:    [ b1
-			#                            b2 ]
-			# Where the original is a row vector and the other is a column vector
-			# This distinction in shape is important for matrix multiplication
-			# but since it's one dimensional the numpy view seemingly makes no
-			# distinction. It just returns an iterator. To fix this, you have
-			# to force it into a 2D array simply by enclosing the single array
-			# into another array. Like so: [ [b1, b2] ]
-			# h = np.array([h])
-			# y_hat = np.array([y_hat])
-
 			sample = np.array([X[j]])
-
 
 			# Since labels is a list of classes (0 or 1), have to convert to a probability distribution
 			yj = []
@@ -116,38 +102,36 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 			dl_b1 = dl_da
 			dl_b2 = dl_dy
 
+			# Addition of zeroes cuz meh
 			grad_W1 = grad_W1 + dl_w1
 			grad_W2 = grad_W2 + dl_w2
 			grad_b1 = grad_b1 + dl_b1
 			grad_b2 = grad_b2 + dl_b2
 
-		## finished one epoch
+			
 
-		# Fix shape change
-		# grad_b1 = np.reshape(grad_b1, b1.shape)
-		# grad_b2 = np.reshape(grad_b2, b2.shape)
+			# update weights and biases
+			W1 = np.subtract(W1, grad_W1*learning_rate)
+			W2 = np.subtract(W2, grad_W2*learning_rate)
+			b1 = np.subtract(b1, grad_b1*learning_rate)
+			b2 = np.subtract(b2, grad_b2*learning_rate)
 
-		# Get average gradients
-		grad_W1 = grad_W1/N
-		grad_W2 = grad_W2/N
-		grad_b1 = grad_b1/N
-		grad_b2 = grad_b2/N
+			# update model
+			model["W1"] = W1
+			model["W2"] = W2
+			model["b1"] = b1
+			model["b2"] = b2
 
-		# update weights and biases
-		W1 = np.subtract(W1, grad_W1*learning_rate)
-		W2 = np.subtract(W2, grad_W2*learning_rate)
-		b1 = np.subtract(b1, grad_b1*learning_rate)
-		b2 = np.subtract(b2, grad_b2*learning_rate)
-		model["W1"] = W1
-		model["W2"] = W2
-		model["b1"] = b1
-		model["b2"] = b2
+			iteration = iteration + 1
 
-		# Clear average gradient counters and keep going
-		grad_W1 = np.zeros((len(X[0]), nn_hdim))
-		grad_W2 = np.zeros((nn_hdim, 2))
-		grad_b1 = np.zeros(nn_hdim)
-		grad_b2 = np.zeros(2)
+			# Clean up
+			# Clear average gradient counters and keep going
+			grad_W1 = np.zeros((len(X[0]), nn_hdim))
+			grad_W2 = np.zeros((nn_hdim, 2))
+			grad_b1 = np.zeros(nn_hdim)
+			grad_b2 = np.zeros(2)
+
+		
 
 	return model
 			
