@@ -2,7 +2,7 @@
 # @Author: Chris Peterson
 # @Date:   2019-11-03 18:39:25
 # @Last Modified by:   Chris Peterson
-# @Last Modified time: 2019-11-07 19:35:24
+# @Last Modified time: 2019-11-07 19:46:26
 from neural_network import *
 import numpy as np
 from sklearn.datasets import make_moons
@@ -25,7 +25,7 @@ def plot_decision_boundary(pred_func, X, y):
     plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.Spectral)
 
 
-np.random.seed(5)
+np.random.seed(0)
 X, y = make_moons(200, noise=0.20)
 plt.scatter(X[:, 0], X[:, 1], s=40, c=y, cmap=plt.cm.Spectral)
 
@@ -34,7 +34,7 @@ hidden_layer_dimensions = [1, 2, 3, 4]
 for i, nn_hdim in enumerate(hidden_layer_dimensions):
     plt.subplot(5, 2, i + 1)
     plt.title('HiddenLayerSize%d' % nn_hdim)
-    model = build_model(X, y, nn_hdim, print_loss=False, num_passes=400000)
+    model = build_model(X, y, nn_hdim, print_loss=False, num_passes=200000)
     print('model', model)
     plot_decision_boundary(lambda X: np.array([predict(model, x) for x in X]), X, y)
     # plot_decision_boundary(lambda x:  predict(model,x),X,y)
