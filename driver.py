@@ -2,13 +2,13 @@
 # @Author: Chris Peterson
 # @Date:   2019-11-03 18:39:25
 # @Last Modified by:   Chris Peterson
-# @Last Modified time: 2019-11-06 12:33:22
+# @Last Modified time: 2019-11-07 16:19:26
 import neural_network as nnet
 import numpy as np
 from sklearn.datasets import make_moons
 import matplotlib.pyplot as plt
 
-
+# Fancy comment for commit message
 # import neural_network
 
 def plot_decision_boundary(pred_func, X, y):
