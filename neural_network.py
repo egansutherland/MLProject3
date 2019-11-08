@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-import copy
 learning_rate = 0.01
 
 
@@ -64,9 +63,8 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 
 	# Total values in dataset
 	N = len(X)
-	iteration = 0
 
-	while iteration < num_passes:
+	for i in range(0, num_passes):
 		for j in range(0, len(X)):
 
 
@@ -78,9 +76,9 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 			y_hat = np.true_divide(z[0], np.sum(z[0]))
 
 			# print the loss every 1000 epochs
-			if print_loss and iteration % 1000 == 0:
+			if print_loss and i % 1000 == 0 and j ==0:
 				loss = calculate_loss(model, X, y)
-				print('iteration:', iteration, 'loss:', loss)
+				print('epoch:', i, 'loss:', loss)
 
 			# Some set up for the back propagation
 			sample = np.array([X[j]])
@@ -122,7 +120,6 @@ def build_model(X, y, nn_hdim, num_passes=20000, print_loss=False):
 			model["b1"] = b1
 			model["b2"] = b2
 
-			iteration = iteration + 1
 
 			# Clean up
 			# Clear average gradient counters and keep going
